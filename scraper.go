@@ -5,13 +5,16 @@ import (
 	"time"
 
 	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/launcher"
 )
 
 const url = "https://howlongtobeat.com/?q=elden%2520ring"
 
 func scrapSearchId() (string, error) {
 	foundSearchId := ""
-	browser := rod.New().MustConnect()
+	path, _ := launcher.LookPath()
+	u := launcher.New().Bin(path).MustLaunch()
+	browser := rod.New().ControlURL(u).MustConnect()
 	defer browser.MustClose()
 
 	router := browser.HijackRequests()
