@@ -8,14 +8,6 @@ const (
 	SearchTypeGames SearchType = "games"
 )
 
-type SearchRequest struct {
-	SearchType    string        `json:"searchType,required"`
-	SearchTerms   []string      `json:"searchTerms,required"`
-	SearchPage    int           `json:"searchPage,required"`
-	PageSize      int           `json:"size,required"`
-	SearchOptions searchOptions `json:"searchOptions,required"`
-}
-
 type searchOptions struct {
 	Games      searchOptionsGames `json:"games,required"`
 	Users      searchOptionsUsers `json:"users,required"`
@@ -26,7 +18,7 @@ type searchOptions struct {
 
 type searchOptionsGames struct {
 	UserId        int                         `json:"userId,required"`
-	Platform      string                      `json:"platform,required"`
+	Platform      Platform                    `json:"platform,required"`
 	SortCategory  string                      `json:"sortCategory,required"`
 	RangeCategory string                      `json:"rangeCategory,required"`
 	RangeTime     searchOptionsGamesRangeTime `json:"rangeTime,required"`
@@ -60,7 +52,11 @@ type SearchResult struct {
 	Data        []Game `json:"data"`
 }
 
-func (c Client) Search(request SearchRequest) (SearchResult, error) {
+func (c *Client) Search(request SearchRequest) (SearchResult, error) {
+	if c.searchIdTimedOut() {
+		c.findSearchId()
+	}
+
 	result, err := request.send(c.searchId)
 	if err != nil {
 		return SearchResult{}, fmt.Errorf("request failed: %v", err)

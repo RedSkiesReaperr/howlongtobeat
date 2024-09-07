@@ -10,17 +10,35 @@ import (
 	"github.com/corpix/uarand"
 )
 
+type SearchRequest struct {
+	SearchType    string        `json:"searchType,required"`
+	SearchTerms   []string      `json:"searchTerms,required"`
+	SearchPage    int           `json:"searchPage,required"`
+	PageSize      int           `json:"size,required"`
+	SearchOptions searchOptions `json:"searchOptions,required"`
+}
+
 func NewSearchRequest(searchTerms string) (SearchRequest, error) {
 	request := SearchRequest{}
 	request.setDefaults()
-
-	parsedTerms, err := parseTerms(searchTerms)
-	if err != nil {
-		return request, fmt.Errorf("can't parse terms: %v", err)
-	}
-	request.SearchTerms = parsedTerms
+	request.SetSearchTerms(searchTerms)
 
 	return request, nil
+}
+
+func (s *SearchRequest) SetSearchTerms(terms string) {
+	result := strings.Split(terms, " ")
+
+	s.SearchTerms = result
+}
+
+func (s *SearchRequest) SetPlatform(newP Platform) {
+	s.SearchOptions.Games.Platform = newP
+}
+
+func (s *SearchRequest) SetPagination(pageIndex, pageSize int) {
+	s.SearchPage = pageIndex
+	s.PageSize = pageSize
 }
 
 func (s *SearchRequest) setDefaults() {
@@ -29,7 +47,7 @@ func (s *SearchRequest) setDefaults() {
 	s.PageSize = 20
 	s.SearchOptions.Games = searchOptionsGames{
 		UserId:        0,
-		Platform:      string(PlatformAll),
+		Platform:      PlatformAll,
 		SortCategory:  "popular",
 		RangeCategory: "main",
 		RangeTime:     searchOptionsGamesRangeTime{},
@@ -84,12 +102,6 @@ func (s SearchRequest) send(searchId string) (SearchResult, error) {
 	if err != nil {
 		return result, fmt.Errorf("invalid response body: %s", err)
 	}
-
-	return result, nil
-}
-
-func parseTerms(terms string) ([]string, error) {
-	result := strings.Split(terms, " ")
 
 	return result, nil
 }
