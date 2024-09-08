@@ -31,9 +31,6 @@ type Game struct {
 	ReviewScore          int    `json:"review_score"`
 	CountPlaying         int    `json:"count_playing"`
 	CountRetired         int    `json:"count_retired"`
-	ProfileDev           string `json:"profile_dev"`
 	ProfilePopular       int    `json:"profile_popular"`
-	ProfileSteam         int    `json:"profile_steam"`
-	ProfilePlatform      string `json:"profile_platform"` //TODO: Parse by ',' + type []string
 	ReleaseWord          int    `json:"release_world"`
 }

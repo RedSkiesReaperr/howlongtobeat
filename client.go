@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-const searchIdTimeout int = 6 // Hours
+const searchIdTimeout int = 2 // Hours
 
 type Client struct {
 	searchId        string

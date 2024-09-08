@@ -27,6 +27,43 @@ for _, game := range result.Data {
     fmt.Println(game.Name)
 }
 ```
+# Customize your request
+After creating a SearchRequest you can send it as is or customize it, to do so you have several options: 
+
+#### Customize search terms
+```go
+request.SetSearchTerms("new terms")
+```
+
+#### Customize target platform
+You can find a list of available platforms [here](https://github.com/RedSkiesReaperr/howlongtobeat/blob/main/platforms.go)
+```go
+request.SetPlatform(howlongtobeat.PlatformPC)
+```
+
+#### Customize pagination
+```go
+// Retrieve page number 2 with a page size of 25
+request.SetPagination(2, 25)
+```
+
+#### Customize game modifiers
+You can find a list of available modifiers [here](https://github.com/RedSkiesReaperr/howlongtobeat/blob/main/modifiers.go)
+```go
+request.SetModifier(howlongtobeat.ModifierOnlyDlc)
+```
+
+#### Customize sorting
+You can find a list of available sort kinds [here](https://github.com/RedSkiesReaperr/howlongtobeat/blob/main/sortby.go)
+```go
+request.SetSorting(howlongtobeat.SortByReleaseDate)
+```
+
+#### Customize gameplay
+You can find a list of available gameplay parts [here](https://github.com/RedSkiesReaperr/howlongtobeat/blob/main/gameplay.go)
+```go
+request.SetGameplay(howlongtobeat.PerspectiveThirdPerson, howlongtobeat.FlowPointAndClick, howlongtobeat.GenreHorror)
+```
 
 ## Dependencies
 Thanks to all the authors who created and maintains the following packages:

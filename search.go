@@ -2,12 +2,6 @@ package howlongtobeat
 
 import "fmt"
 
-type SearchType string
-
-const (
-	SearchTypeGames SearchType = "games"
-)
-
 type searchOptions struct {
 	Games      searchOptionsGames `json:"games,required"`
 	Users      searchOptionsUsers `json:"users,required"`
@@ -19,11 +13,11 @@ type searchOptions struct {
 type searchOptionsGames struct {
 	UserId        int                         `json:"userId,required"`
 	Platform      Platform                    `json:"platform,required"`
-	SortCategory  string                      `json:"sortCategory,required"`
+	SortCategory  SortBy                      `json:"sortCategory,required"`
 	RangeCategory string                      `json:"rangeCategory,required"`
 	RangeTime     searchOptionsGamesRangeTime `json:"rangeTime,required"`
 	Gameplay      searchOptionsGamesGameplay  `json:"gameplay,required"`
-	Modifier      string                      `json:"modifier,required"`
+	Modifier      Modifier                    `json:"modifier,required"`
 }
 
 type searchOptionsUsers struct {
@@ -36,9 +30,9 @@ type searchOptionsGamesRangeTime struct {
 }
 
 type searchOptionsGamesGameplay struct {
-	Perspective string `json:"perspective"`
-	Flow        string `json:"flow"`
-	Genre       string `json:"genre"`
+	Perspective Perspective `json:"perspective"`
+	Flow        Flow        `json:"flow"`
+	Genre       Genre       `json:"genre"`
 }
 
 type SearchResult struct {

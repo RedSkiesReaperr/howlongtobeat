@@ -11,7 +11,7 @@ import (
 )
 
 type SearchRequest struct {
-	SearchType    string        `json:"searchType,required"`
+	SearchType    SearchType    `json:"searchType,required"`
 	SearchTerms   []string      `json:"searchTerms,required"`
 	SearchPage    int           `json:"searchPage,required"`
 	PageSize      int           `json:"size,required"`
@@ -41,22 +41,36 @@ func (s *SearchRequest) SetPagination(pageIndex, pageSize int) {
 	s.PageSize = pageSize
 }
 
+func (s *SearchRequest) SetModifier(modifier Modifier) {
+	s.SearchOptions.Games.Modifier = modifier
+}
+
+func (s *SearchRequest) SetSorting(sort SortBy) {
+	s.SearchOptions.Games.SortCategory = sort
+}
+
+func (s *SearchRequest) SetGameplay(pers Perspective, flow Flow, genre Genre) {
+	s.SearchOptions.Games.Gameplay.Perspective = pers
+	s.SearchOptions.Games.Gameplay.Flow = flow
+	s.SearchOptions.Games.Gameplay.Genre = genre
+}
+
 func (s *SearchRequest) setDefaults() {
-	s.SearchType = string(SearchTypeGames)
+	s.SearchType = SearchTypeGames
 	s.SearchPage = 1
 	s.PageSize = 20
 	s.SearchOptions.Games = searchOptionsGames{
 		UserId:        0,
 		Platform:      PlatformAll,
-		SortCategory:  "popular",
+		SortCategory:  SortByMostPopular,
 		RangeCategory: "main",
 		RangeTime:     searchOptionsGamesRangeTime{},
 		Gameplay: searchOptionsGamesGameplay{
-			Perspective: "",
-			Flow:        "",
-			Genre:       "",
+			Perspective: PerspectiveAll,
+			Flow:        FlowAll,
+			Genre:       GenreAll,
 		},
-		Modifier: "",
+		Modifier: ModifierAll,
 	}
 	s.SearchOptions.Users = searchOptionsUsers{
 		SortCategory: "postcount",
