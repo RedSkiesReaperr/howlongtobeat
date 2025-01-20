@@ -33,6 +33,7 @@ type searchOptionsGamesGameplay struct {
 	Perspective Perspective `json:"perspective"`
 	Flow        Flow        `json:"flow"`
 	Genre       Genre       `json:"genre"`
+	Difficulty  Difficulty  `json:"difficulty"`
 }
 
 type SearchResult struct {
@@ -47,11 +48,11 @@ type SearchResult struct {
 }
 
 func (c *Client) Search(request SearchRequest) (SearchResult, error) {
-	if c.searchIdTimedOut() {
-		c.findSearchId()
+	if c.searchApiInfosTimedOut() {
+		c.findApiInfos()
 	}
 
-	result, err := request.send(c.searchId)
+	result, err := request.send(c.api)
 	if err != nil {
 		return SearchResult{}, fmt.Errorf("request failed: %v", err)
 	}

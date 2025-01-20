@@ -62,7 +62,7 @@ request.SetSorting(howlongtobeat.SortByReleaseDate)
 #### Customize gameplay
 You can find a list of available gameplay parts [here](https://github.com/RedSkiesReaperr/howlongtobeat/blob/main/gameplay.go)
 ```go
-request.SetGameplay(howlongtobeat.PerspectiveThirdPerson, howlongtobeat.FlowPointAndClick, howlongtobeat.GenreHorror)
+request.SetGameplay(howlongtobeat.PerspectiveThirdPerson, howlongtobeat.FlowPointAndClick, howlongtobeat.GenreHorror, howlongtobeat.DifficultyAll)
 ```
 
 ## Dependencies

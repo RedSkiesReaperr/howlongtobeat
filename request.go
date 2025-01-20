@@ -49,10 +49,11 @@ func (s *SearchRequest) SetSorting(sort SortBy) {
 	s.SearchOptions.Games.SortCategory = sort
 }
 
-func (s *SearchRequest) SetGameplay(pers Perspective, flow Flow, genre Genre) {
+func (s *SearchRequest) SetGameplay(pers Perspective, flow Flow, genre Genre, difficulty Difficulty) {
 	s.SearchOptions.Games.Gameplay.Perspective = pers
 	s.SearchOptions.Games.Gameplay.Flow = flow
 	s.SearchOptions.Games.Gameplay.Genre = genre
+	s.SearchOptions.Games.Gameplay.Difficulty = difficulty
 }
 
 func (s *SearchRequest) setDefaults() {
@@ -80,8 +81,7 @@ func (s *SearchRequest) setDefaults() {
 	s.SearchOptions.Randomizer = 0
 }
 
-func (s SearchRequest) send(searchId string) (SearchResult, error) {
-	url := fmt.Sprintf("https://howlongtobeat.com/api/search/%s", searchId)
+func (s SearchRequest) send(api *api) (SearchResult, error) {
 	result := SearchResult{}
 	httpClient := &http.Client{}
 
@@ -90,11 +90,13 @@ func (s SearchRequest) send(searchId string) (SearchResult, error) {
 		return result, fmt.Errorf("invalid body: %s", err)
 	}
 
-	req, _ := http.NewRequest("POST", url, strings.NewReader(string(requestBody)))
+	req, _ := http.NewRequest("POST", api.searchUrl(), strings.NewReader(string(requestBody)))
 	req.Header = map[string][]string{
-		"Content-Type": {"application/json"},
+		"Accept":       {"*/*"},
+		"Host":         {"howlongtobeat.com"},
 		"User-Agent":   {uarand.GetRandom()},
 		"Referer":      {"https://howlongtobeat.com/"},
+		"Content-Type": {"application/json"},
 	}
 
 	resp, err := httpClient.Do(req)

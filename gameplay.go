@@ -73,3 +73,9 @@ const (
 	GenreVehicularCombat  Genre = "Vehicular Combat"
 	GenreVisualNovel      Genre = "Visual Novel"
 )
+
+type Difficulty string
+
+const (
+	DifficultyAll Difficulty = ""
+)
