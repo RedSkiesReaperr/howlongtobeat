@@ -81,7 +81,7 @@ func (s *SearchRequest) setDefaults() {
 	s.SearchOptions.Randomizer = 0
 }
 
-func (s SearchRequest) send(api *api) (SearchResult, error) {
+func (s SearchRequest) send(api *api, authToken string) (SearchResult, error) {
 	result := SearchResult{}
 	httpClient := &http.Client{}
 
@@ -99,6 +99,10 @@ func (s SearchRequest) send(api *api) (SearchResult, error) {
 		"Content-Type": {"application/json"},
 	}
 
+	if authToken != "" {
+		req.Header.Set("x-auth-token", authToken)
+	}
+
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return result, fmt.Errorf("error: %s", err)
@@ -111,12 +115,12 @@ func (s SearchRequest) send(api *api) (SearchResult, error) {
 	}
 
 	if resp.StatusCode != 200 {
-		return result, fmt.Errorf("request failed: %s", resp.Status)
+		return result, fmt.Errorf("request failed: %s (Body: %s)", resp.Status, string(body))
 	}
 
 	err = json.Unmarshal(body, &result)
 	if err != nil {
-		return result, fmt.Errorf("invalid response body: %s", err)
+		return result, fmt.Errorf("invalid response body: %s (Body: %s)", err, string(body))
 	}
 
 	return result, nil

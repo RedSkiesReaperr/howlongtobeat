@@ -2,7 +2,9 @@ package howlongtobeat
 
 import (
 	"fmt"
+	"net/http"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/go-rod/rod"
@@ -17,7 +19,7 @@ type scrapResult struct {
 }
 
 func scrapApiInfos() (api, error) {
-	baseUrl := "https://howlongtobeat.com/?q=elden%2520ring"
+	baseUrl := "https://howlongtobeat.com/"
 	result := scrapResult{}
 
 	browser := setupBrowser()
@@ -29,19 +31,23 @@ func scrapApiInfos() (api, error) {
 	}
 	defer router.MustStop()
 
-	if err := router.Add("*_app-*.js", proto.NetworkResourceTypeScript, result.process); err != nil {
+	if err := router.Add("*.js", proto.NetworkResourceTypeScript, result.process); err != nil {
 		return api{}, fmt.Errorf("hijack failed: %v", err)
 	}
 
 	go router.Run()
-	browser.MustPage(baseUrl).MustWaitElementsMoreThan("input[name=site-search]", 0)
+	page := browser.MustPage(baseUrl)
 
-	waitSeconds := 10
+	// Scroll to trigger JS
+	page.MustEval("() => window.scrollTo(0, document.body.scrollHeight)")
+	page.MustWaitElementsMoreThan("input[name=site-search]", 0)
+
+	waitSeconds := 15
 	for i := 0; i < waitSeconds && !result.isScrapped(); i++ {
 		time.Sleep(1 * time.Second)
 	}
 
-	return api{key: result.apiKey, path: result.apiPath}, result.scrapErr
+	return api{path: result.apiPath}, result.scrapErr
 }
 
 func setupBrowser() *rod.Browser {
@@ -59,34 +65,39 @@ func setupRouter(browser *rod.Browser) (*rod.HijackRouter, error) {
 }
 
 func (sr *scrapResult) process(ctx *rod.Hijack) {
-	ctx.MustLoadResponse()               // Force to continue script downloading reaquest
+	err := ctx.LoadResponse(http.DefaultClient, true)
+	if err != nil {
+		return
+	}
 	scriptContent := ctx.Response.Body() // Script content
 
-	path, key, err := extractApiInfos(scriptContent)
+	path, err := extractApiInfos(scriptContent)
 	if err != nil {
-		sr.scrapErr = fmt.Errorf("extract api infos: %v", err)
 		return
 	}
 
-	sr.apiKey = key
 	sr.apiPath = path
 }
 
 func (sr *scrapResult) isScrapped() bool {
-	return sr.apiPath != "" || sr.apiKey != "" || sr.scrapErr != nil
+	return sr.apiPath != "" || sr.scrapErr != nil
 }
 
-func extractApiInfos(src string) (path string, key string, err error) {
-	pattern := `(\/api\/[a-zA-Z0-9\/]*)".concat\("([a-zA-Z0-9]+)"\).concat\("([a-zA-Z0-9]+)"\)`
-	re := regexp.MustCompile(pattern)
-	matches := re.FindStringSubmatch(src)
+func extractApiInfos(src string) (path string, err error) {
+	// Pattern to find the search endpoint.
+	re := regexp.MustCompile(`(?i)fetch\s*\(\s*["'](\/api\/[a-zA-Z0-9_/]+)[^"']*["']\s*,\s*\{[^}]*method:\s*["']POST["']`)
+	match := re.FindStringSubmatch(src)
 
-	if matches == nil {
-		return "", "", fmt.Errorf("no match found")
+	if match != nil {
+		apiPath := match[1]
+
+		// Ignore non-search endpoints
+		if strings.Contains(apiPath, "logout") || strings.Contains(apiPath, "user") || strings.Contains(apiPath, "error") {
+			return "", fmt.Errorf("ignoring non-search endpoint: %s", apiPath)
+		}
+
+		return apiPath, nil
 	}
 
-	path = matches[1]
-	key = matches[2] + matches[3]
-	err = nil
-	return
+	return "", fmt.Errorf("no valid match found")
 }

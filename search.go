@@ -1,6 +1,9 @@
 package howlongtobeat
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type searchOptions struct {
 	Games      searchOptionsGames `json:"games,required"`
@@ -52,9 +55,24 @@ func (c *Client) Search(request SearchRequest) (SearchResult, error) {
 		c.findApiInfos()
 	}
 
-	result, err := request.send(c.api)
+	if c.authToken == "" {
+		if err := c.refreshAuthToken(); err != nil {
+			fmt.Printf("WARNING: can't refresh auth token: %v\n", err)
+		}
+	}
+
+	result, err := request.send(c.api, c.authToken)
 	if err != nil {
-		return SearchResult{}, fmt.Errorf("request failed: %v", err)
+		// If it failed with 404/403, maybe the token or api path expired earlier
+		if strings.Contains(err.Error(), "404") || strings.Contains(err.Error(), "403") {
+			c.findApiInfos()
+			c.refreshAuthToken()
+			result, err = request.send(c.api, c.authToken)
+		}
+
+		if err != nil {
+			return SearchResult{}, fmt.Errorf("request failed: %v", err)
+		}
 	}
 
 	return result, nil
