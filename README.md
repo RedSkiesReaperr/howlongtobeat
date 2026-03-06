@@ -1,5 +1,8 @@
 # howlongtobeat
-Unofficial Go implementation of HowLongToBeat website API
+Unofficial Go implementation of HowLongToBeat website API. It uses a headless browser to dynamically discover the internal API endpoints and authentication tokens.
+
+# Prerequisites
+This library uses [go-rod](https://github.com/go-rod/rod) to scrape the website. It requires a browser (Chrome/Chromium) to be installed on your system. Go-rod will try to find a browser automatically or download one if not found.
 
 # Installation
 ```bash
@@ -27,6 +30,13 @@ for _, game := range result.Data {
     fmt.Println(game.Name)
 }
 ```
+
+# Quick start
+A manual test script is provided in the `examples/` directory to help you test the library quickly:
+```bash
+go run examples/main.go
+```
+
 # Customize your request
 After creating a SearchRequest you can send it as is or customize it, to do so you have several options: 
 
