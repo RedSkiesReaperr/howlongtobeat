@@ -54,7 +54,6 @@ func setupBrowser() *rod.Browser {
 	path, _ := launcher.LookPath()
 	u := launcher.New().Bin(path).MustLaunch()
 	browser := rod.New().ControlURL(u).MustConnect()
-
 	return browser
 }
 
@@ -85,7 +84,7 @@ func (sr *scrapResult) isScrapped() bool {
 
 func extractApiInfos(src string) (path string, err error) {
 	// Pattern to find the search endpoint.
-	re := regexp.MustCompile(`(?i)fetch\s*\(\s*["'](\/api\/[a-zA-Z0-9_/]+)[^"']*["']\s*,\s*\{[^}]*method:\s*["']POST["']`)
+	re := regexp.MustCompile(`(?i)fetch\s*\(\s*["'](/api/[a-zA-Z0-9_/]+)[^"']*["']\s*,\s*\{[^}]*method:\s*["']POST["']`)
 	match := re.FindStringSubmatch(src)
 
 	if match != nil {

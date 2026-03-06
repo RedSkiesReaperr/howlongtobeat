@@ -107,7 +107,7 @@ func (s SearchRequest) send(api *api, authToken string) (SearchResult, error) {
 	if err != nil {
 		return result, fmt.Errorf("error: %s", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
