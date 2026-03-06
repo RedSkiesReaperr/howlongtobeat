@@ -1,6 +1,6 @@
 module github.com/RedSkiesReaperr/howlongtobeat
 
-go 1.21.1
+go 1.26.0
 
 require (
 	github.com/corpix/uarand v0.2.0
@@ -11,7 +11,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/ysmood/fetchup v0.2.3 // indirect
 	github.com/ysmood/goob v0.4.0 // indirect
-	github.com/ysmood/got v0.40.0 // indirect
+	github.com/ysmood/got v0.42.3 // indirect
 	github.com/ysmood/gson v0.7.3 // indirect
 	github.com/ysmood/leakless v0.9.0 // indirect
 )
